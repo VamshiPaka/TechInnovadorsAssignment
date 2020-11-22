@@ -1,15 +1,18 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const mongoose = require('mongoose');
-require('dotenv').config()
+require('dotenv').config();
 
+//import routes
+const booksRoute = require('./routes/books');
 
 //database connection
-const uri = `mongodb+srv://vamshi:${process.env.DB_PASSWORD}@library.5cvhr.mongodb.net/${process.env.DB_UNAME}?retryWrites=true&w=majority`;  
 
 mongoose
-	.connect(uri, {
+	.connect(process.env.DB_CONNECTION, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true
 	})
@@ -18,8 +21,15 @@ mongoose
 	})
 	.catch((err) => console.log(err));
 
+//Middlewares(functions that are executed when a specific route is hit)
+
+app.use(bodyParser.json());
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/books', booksRoute);
+
 app.get('/', (req, res) => {
-	res.send('Hello World!');
+	res.send('This is Home Route');
 });
 
 app.listen(port, () => {
